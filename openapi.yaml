@@ -1,0 +1,383 @@
+openapi: 3.0.3
+info:
+  title: Job Application Management API
+  version: 1.0.0
+  description: REST API untuk platform manajemen lamaran pekerjaan (Job Seeker dan Company).
+servers:
+  - url: http://localhost:4000/api
+    description: Local development server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    StandardSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+
+    StandardError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+        requestId:
+          type: string
+
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+        total:
+          type: integer
+          example: 25
+        totalPages:
+          type: integer
+          example: 3
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      tags: [System]
+      responses:
+        '200':
+          description: Server running ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: ok
+
+  /auth/register:
+    post:
+      summary: Pendaftaran akun baru
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password, role]
+              properties:
+                name:
+                  type: string
+                  example: Budi Santoso
+                email:
+                  type: string
+                  format: email
+                  example: budi@test.com
+                password:
+                  type: string
+                  example: Password123
+                role:
+                  type: string
+                  enum: [JOB_SEEKER, COMPANY]
+                  example: JOB_SEEKER
+                companyName:
+                  type: string
+                  example: Tech Corp
+      responses:
+        '201':
+          description: Akun berhasil didaftarkan
+        '400':
+          description: Validasi input gagal
+        '409':
+          description: Email sudah terdaftar
+
+  /auth/login:
+    post:
+      summary: Masuk ke sistem
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  example: seeker@test.com
+                password:
+                  type: string
+                  example: Password123
+      responses:
+        '200':
+          description: Login berhasil, mengembalikan data user dan token
+        '401':
+          description: Email atau kata sandi tidak valid
+
+  /auth/me:
+    get:
+      summary: Mendapatkan profil pengguna yang sedang login
+      tags: [Auth]
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Data profil pengguna
+
+  /jobs:
+    get:
+      summary: Daftar lowongan pekerjaan berstatus OPEN
+      tags: [Jobs]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: jobType
+          in: query
+          schema:
+            type: string
+            enum: [FULL_TIME, PART_TIME, CONTRACT, INTERNSHIP, FREELANCE]
+        - name: location
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Daftar lowongan dengan pagination
+
+    post:
+      summary: Membuat lowongan pekerjaan baru (khusus Company)
+      tags: [Jobs]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, description, location, jobType]
+              properties:
+                title:
+                  type: string
+                  example: Senior Backend Engineer
+                description:
+                  type: string
+                  example: Membangun sistem berskala tinggi dengan Node.js dan TypeScript.
+                location:
+                  type: string
+                  example: Jakarta Selatan
+                jobType:
+                  type: string
+                  enum: [FULL_TIME, PART_TIME, CONTRACT, INTERNSHIP, FREELANCE]
+                salaryMin:
+                  type: integer
+                  example: 15000000
+                salaryMax:
+                  type: integer
+                  example: 25000000
+      responses:
+        '201':
+          description: Lowongan berhasil dibuat
+        '403':
+          description: Akses ditolak (bukan akun Company)
+
+  /jobs/mine:
+    get:
+      summary: Daftar lowongan milik perusahaan sendiri
+      tags: [Jobs]
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Daftar lowongan beserta jumlah pelamar (applicantCount)
+
+  /jobs/{id}:
+    get:
+      summary: Detail lowongan pekerjaan
+      tags: [Jobs]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Detail lowongan
+        '404':
+          description: Lowongan tidak ditemukan
+
+  /jobs/{id}/apply:
+    post:
+      summary: Melamar pekerjaan (khusus Job Seeker)
+      tags: [Applications]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '201':
+          description: Berhasil melamar pekerjaan
+        '409':
+          description: Anda sudah melamar lowongan ini
+
+  /jobs/{id}/applications:
+    get:
+      summary: Daftar pelamar lowongan (khusus Company pemilik)
+      tags: [Applications]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [APPLIED, REVIEWING, SHORTLISTED, REJECTED, ACCEPTED]
+      responses:
+        '200':
+          description: Daftar kandidat pelamar
+
+  /applications/mine:
+    get:
+      summary: Daftar lamaran milik pelamar sendiri (khusus Job Seeker)
+      tags: [Applications]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [APPLIED, REVIEWING, SHORTLISTED, REJECTED, ACCEPTED]
+      responses:
+        '200':
+          description: Riwayat lamaran pekerjaan
+
+  /applications/{id}/status:
+    patch:
+      summary: Memperbarui status lamaran kandidat (khusus Company pemilik)
+      tags: [Applications]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [APPLIED, REVIEWING, SHORTLISTED, REJECTED, ACCEPTED]
+                note:
+                  type: string
+                  example: Lolos ke tahap technical test
+      responses:
+        '200':
+          description: Status lamaran berhasil diperbarui
+        '400':
+          description: Status baru sama dengan status saat ini
+
+  /applications/{id}/history:
+    get:
+      summary: Riwayat perubahan status lamaran (Job Seeker pelamar atau Company pemilik)
+      tags: [Applications]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Riwayat status lamaran secara kronologis
+
