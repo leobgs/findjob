@@ -180,6 +180,18 @@ describe('Applications Module Integration Tests', () => {
     expect(res.body.message).toContain('tidak boleh sama');
   });
 
+  it('PATCH /api/applications/:id/status should reject APPLIED status as company cannot change status back to APPLIED (400)', async () => {
+    const res = await request(app)
+      .patch(`/api/applications/${createdApplicationId}/status`)
+      .set('Authorization', `Bearer ${company1Token}`)
+      .send({
+        status: 'APPLIED',
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+  });
+
   it('PATCH /api/applications/:id/status should return 404 when Company B tries to update Company A application', async () => {
     const res = await request(app)
       .patch(`/api/applications/${createdApplicationId}/status`)

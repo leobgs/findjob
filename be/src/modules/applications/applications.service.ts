@@ -115,6 +115,9 @@ export class ApplicationsService {
         title: app.job.title,
         location: app.job.location,
         jobType: app.job.jobType,
+        company: {
+          name: app.job.company.name,
+        },
       },
       company: {
         name: app.job.company.name,

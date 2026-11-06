@@ -43,7 +43,6 @@ export const updateStatusBodySchema = z
   .object({
     status: z.enum(
       [
-        ApplicationStatus.APPLIED,
         ApplicationStatus.REVIEWING,
         ApplicationStatus.SHORTLISTED,
         ApplicationStatus.REJECTED,
