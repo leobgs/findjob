@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: findjob-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-findjob_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Rahasia12345}
+      POSTGRES_DB: ${POSTGRES_DB:-findjob_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - findjob-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-findjob_user} -d ${POSTGRES_DB:-findjob_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: ./be
+      dockerfile: Dockerfile
+    container_name: findjob-server
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - findjob-network
+
+  client:
+    build:
+      context: ./fe
+      dockerfile: Dockerfile
+    container_name: findjob-client
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    networks:
+      - findjob-network
+
+volumes:
+  postgres_data:
+
+networks:
+  findjob-network:
+    driver: bridge
+
