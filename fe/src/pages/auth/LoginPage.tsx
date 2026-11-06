@@ -190,46 +190,51 @@ export const LoginPage: React.FC = () => {
             </Button>
           </form>
 
-          {/* Quick Demo Credentials
-          // <div className="mt-6 rounded-lg border border-border bg-muted/40 p-3">
-          //   <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-foreground">
-          //     <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-          //     Akun Demo Cepat ({selectedRole === 'COMPANY' ? 'Perusahaan' : 'Pekerja'}):
-          //   </div>
-          //   <div className="grid grid-cols-2 gap-2 text-xs">
-          //     <button
-          //       type="button"
-          //       onClick={() => {
-          //         setSelectedRole('JOB_SEEKER');
-          //         fillDemo('seeker@test.com');
-          //       }}
-          //       className={`rounded-md border p-2 text-left transition ${
-          //         selectedRole === 'JOB_SEEKER'
-          //           ? 'border-primary bg-primary/5 text-primary'
-          //           : 'border-border bg-background hover:border-primary'
-          //       }`}
-          //     >
-          //       <div className="font-medium text-foreground">Budi Santoso</div>
-          //       <div className="truncate text-muted-foreground">seeker@test.com</div>
-          //     </button>
+          {/* Quick Demo Credentials */}
+          <div className="mt-6 rounded-lg border border-border bg-muted/40 p-3">
+            <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-foreground">
+              <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+              Akun Demo Cepat (
+              {selectedRole === "COMPANY" ? "Perusahaan" : "Pekerja"}):
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedRole("JOB_SEEKER");
+                  fillDemo("seeker@test.com");
+                }}
+                className={`rounded-md border p-2 text-left transition ${
+                  selectedRole === "JOB_SEEKER"
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-border bg-background hover:border-primary"
+                }`}
+              >
+                <div className="font-medium text-foreground">Budi Santoso</div>
+                <div className="truncate text-muted-foreground">
+                  seeker@test.com
+                </div>
+              </button>
 
-          //     <button
-          //       type="button"
-          //       onClick={() => {
-          //         setSelectedRole('COMPANY');
-          //         fillDemo('company@test.com');
-          //       }}
-          //       className={`rounded-md border p-2 text-left transition ${
-          //         selectedRole === 'COMPANY'
-          //           ? 'border-primary bg-primary/5 text-primary'
-          //           : 'border-border bg-background hover:border-primary'
-          //       }`}
-          //     >
-          //       <div className="font-medium text-foreground">Tech Corp</div>
-          //       <div className="truncate text-muted-foreground">company@test.com</div>
-          //     </button>
-          //   </div>
-          // </div> */}
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedRole("COMPANY");
+                  fillDemo("company@test.com");
+                }}
+                className={`rounded-md border p-2 text-left transition ${
+                  selectedRole === "COMPANY"
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-border bg-background hover:border-primary"
+                }`}
+              >
+                <div className="font-medium text-foreground">Tech Corp</div>
+                <div className="truncate text-muted-foreground">
+                  company@test.com
+                </div>
+              </button>
+            </div>
+          </div>
 
           <p className="mt-5 text-center text-xs text-muted-foreground">
             Belum punya akun?{" "}
