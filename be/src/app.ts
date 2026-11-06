@@ -33,13 +33,22 @@ app.use(
         'img-src': ["'self'", 'data:', 'https:'],
       },
     },
-  })
+  }),
 );
 
 const corsOrigins = env.CORS_ORIGIN.split(',').map((origin) => origin.trim());
 app.use(
   cors({
-    origin: corsOrigins,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (corsOrigins.includes(origin) || corsOrigins.includes('*')) {
+        return callback(null, true);
+      }
+      if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   }),
 );

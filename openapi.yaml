@@ -4,6 +4,8 @@ info:
   version: 1.0.0
   description: REST API untuk platform manajemen lamaran pekerjaan (Job Seeker dan Company).
 servers:
+  - url: /api
+    description: Current Server (Production & Local)
   - url: http://localhost:4000/api
     description: Local development server
 
