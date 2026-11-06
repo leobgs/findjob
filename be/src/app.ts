@@ -23,15 +23,17 @@ app.use(requestId);
 
 app.use(
   helmet({
+    crossOriginOpenerPolicy: false,
     contentSecurityPolicy: {
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        'upgrade-insecure-requests': null,
         'script-src': ["'self'", "'unsafe-inline'"],
         'style-src': ["'self'", "'unsafe-inline'"],
         'img-src': ["'self'", 'data:', 'https:'],
       },
     },
-  }),
+  })
 );
 
 const corsOrigins = env.CORS_ORIGIN.split(',').map((origin) => origin.trim());
