@@ -31,7 +31,7 @@ app.use(
         'img-src': ["'self'", 'data:', 'https:'],
       },
     },
-  })
+  }),
 );
 
 const corsOrigins = env.CORS_ORIGIN.split(',').map((origin) => origin.trim());
@@ -39,7 +39,7 @@ app.use(
   cors({
     origin: corsOrigins,
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json({ limit: '100kb' }));
@@ -80,7 +80,10 @@ if (openapiPath) {
       swaggerUi.serve,
       swaggerUi.setup(swaggerDocument, {
         customSiteTitle: 'Indokerja Job Application API - Documentation',
-      })
+        swaggerOptions: {
+          validatorUrl: null,
+        },
+      }),
     );
   } catch (error) {
     if (env.NODE_ENV !== 'test') {
