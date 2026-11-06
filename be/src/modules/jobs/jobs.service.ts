@@ -8,7 +8,7 @@ export class JobsService {
   async listJobs(
     userId: string,
     role: Role,
-    query: ListJobsQuery
+    query: ListJobsQuery,
   ): Promise<{ jobs: unknown[]; meta: PaginationMeta }> {
     const where: Prisma.JobWhereInput = {
       status: JobStatus.OPEN,
@@ -115,6 +115,7 @@ export class JobsService {
         select: {
           id: true,
           status: true,
+          appliedAt: true,
         },
       });
 
@@ -187,4 +188,3 @@ export class JobsService {
 }
 
 export const jobsService = new JobsService();
-
